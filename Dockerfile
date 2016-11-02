@@ -2,7 +2,7 @@ FROM kylemanna/openvpn
 
 ENV LANG=en_US.UTF-8
 
-COPY docker-releases/alpine/requirements.txt requirements.txt /tmp/requirements.txt
+COPY requirements.txt requirements.txt /tmp/requirements.txt
 RUN apk add --no-cache \
         git \
         g++ \
