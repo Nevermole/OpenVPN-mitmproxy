@@ -1,0 +1,3 @@
+[submodule "docker-releases"]
+	path = docker-releases
+	url = https://github.com/mitmproxy/docker-releases
