@@ -54,10 +54,8 @@ RUN apk add --no-cache \
         python3-dev \
         zlib-dev \
     && rm /tmp/requirements.txt \
-    && rm -rf ~/.cache/pip \
-    && adduser -u 7799 -D mitmproxy
+    && rm -rf ~/.cache/pip 
 
-USER mitmproxy
 RUN mkdir /home/mitmproxy/.mitmproxy
 VOLUME /home/mitmproxy/.mitmproxy
 
