@@ -56,7 +56,7 @@ RUN apk add --no-cache \
     && rm /tmp/requirements.txt \
     && rm -rf ~/.cache/pip 
 
-RUN mkdir /home/mitmproxy/.mitmproxy
+RUN mkdir -p /home/mitmproxy/.mitmproxy
 VOLUME /home/mitmproxy/.mitmproxy
 
 EXPOSE 8080 8081
