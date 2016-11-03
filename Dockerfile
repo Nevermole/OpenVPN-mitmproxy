@@ -1,8 +1,28 @@
-FROM kylemanna/openvpn
+FROM alpine:3.4
 
 ENV LANG=en_US.UTF-8
 
-COPY requirements.txt requirements.txt /tmp/requirements.txt
+RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
+    echo "http://dl-4.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
+    apk add --update openvpn iptables bash easy-rsa openvpn-auth-pam google-authenticator pamtester && \
+    ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
+    rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
+
+# Needed by scripts
+ENV OPENVPN /etc/openvpn
+ENV EASYRSA /usr/share/easy-rsa
+ENV EASYRSA_PKI $OPENVPN/pki
+ENV EASYRSA_VARS_FILE $OPENVPN/vars
+
+VOLUME ["/etc/openvpn"]
+
+ADD ./bin /usr/local/bin
+RUN chmod a+x /usr/local/bin/*
+
+# Add support for OTP authentication using a PAM module
+ADD ./otp/openvpn /etc/pam.d/
+
+COPY requirements.txt /tmp/requirements.txt
 RUN apk add --no-cache \
         git \
         g++ \
@@ -34,14 +54,18 @@ RUN apk add --no-cache \
         python3-dev \
         zlib-dev \
     && rm /tmp/requirements.txt \
-    && rm -rf ~/.cache/pip 
+    && rm -rf ~/.cache/pip \
+    && adduser -u 7799 -D mitmproxy
 
-#&& adduser -u 7799 -D mitmproxy
-
-#USER mitmproxy
+USER mitmproxy
 RUN mkdir /home/mitmproxy/.mitmproxy
 VOLUME /home/mitmproxy/.mitmproxy
 
 EXPOSE 8080 8081
+#CMD ["mitmproxy"]
+
+
+# Internally uses port 1194/udp, remap using `docker run -p 443:1194/tcp`
 EXPOSE 1194/udp
-CMD ["ovpn_run", "mitmproxy"]
+
+CMD ["ovpn_run"]
